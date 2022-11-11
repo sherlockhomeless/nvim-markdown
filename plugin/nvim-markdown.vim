@@ -9,6 +9,11 @@
 if exists("g:loaded_nvimmarkdown")
     finish
 endif
+
+let s:save_cpo = &cpo " save user coptions
+set cpo&vim " reset them to defaults
+
+command! Nvimmarkdown lua require('hello').sayHelloWorld()
 let g:loaded_nvimmarkdown = 1
 
 " Defines a package path for Lua. This facilitates importing the
