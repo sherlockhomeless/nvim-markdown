@@ -4,7 +4,9 @@
 -- Create object for all modules, all functions are associated with this object
 local M = {}
 
+M.require('autocmd')
+
+-- 
 print('this is read :)')
--- M.add_bullet_points = someFile.add_bullet_points
 
 return M
