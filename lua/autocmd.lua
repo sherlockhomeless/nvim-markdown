@@ -1,4 +1,4 @@
-require('helper')
+local h = require("helper")
 
 local api = vim.api
 
@@ -27,20 +27,22 @@ local get_indendation_line = function (cur_line)
         else
             return indentation
         end
+    end
 end
 
 
 local create_new_bullet_list_entry = function(table)
-    print(dump(table))
+    -- print(h.dump(table))
     local cur_line = api.nvim_get_current_line()
     local is_bullet_list = is_line_bullet_list(cur_line)
 
     if not is_bullet_list then
+        print('no bullet list')
         return
     end
 
     local indentation = get_indendation_line(cur_line)
-    print(indentation)
+    print('indentation', indentation)
 end
 
 local mdGroup = api.nvim_create_augroup("ExpandMarkdown", { clear = true })
