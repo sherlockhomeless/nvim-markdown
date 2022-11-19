@@ -30,29 +30,20 @@ local get_indendation_line = function(cur_line)
     end
 end
 
-local type_keys = function()
-    local return_value = api.nvim_exec([[ 
-    let col = col('.') - 1
-    echo (!col || getline('.')[col - 1]  =~# '{')
-]], true)
-    print(':)', return_value)
-end
-
 local create_new_bullet_list_entry = function(table)
-    -- print(h.dump(table))
     local cur_line = api.nvim_get_current_line()
-    local is_bullet_list = is_line_bullet_list(cur_line)
+    local is_cur_line_bullet_list = is_line_bullet_list(cur_line)
 
-    if not is_bullet_list then
-        print('no bullet list')
+    if not is_cur_line_bullet_list then
         return
     end
 
-    local indentation = get_indendation_line(cur_line)
-    -- check if last character was <CR>
-    local new_line = h.create_indented_line(indentation)
-    type_keys()
+    local cur_line_num = api.nvim_win_get_cursor(0)[1]
+    local cont_prev_line = api.nvim_buf_get_lines(0, cur_line_num - 2, cur_line_num - 1, false)[1]
 
+   iiii 
+
+    print(h.dump(table))
 end
 
 local mdGroup = api.nvim_create_augroup("ExpandMarkdown", { clear = true })
