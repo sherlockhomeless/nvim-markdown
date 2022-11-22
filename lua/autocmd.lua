@@ -39,24 +39,37 @@ M.create_line = function(indentation)
     return indented_line
 end
 
-M.create_new_bullet_list_entry = function(key)
+M.is_file_type = function(ftype)
+    return ftype == vim.bo.filetype
+end
 
+M.is_mode = function(mode)
+    return mode == vim.api.nvim_get_mode()['mode']
+end
+
+M.get_prev_and_cur_line = function(cur_line_num)
+    local cont_prev_line = vim.api.nvim_buf_get_lines(0, cur_line_num - 2, cur_line_num - 1, false)[1]
+    local cont_cur_line = vim.api.nvim_buf_get_lines(0, cur_line_num - 1, cur_line_num, false)[1]
+    return cont_prev_line, cont_cur_line
+end
+--
+-- check if file is markdown file
+-- check if in insert mode
+--
+M.create_new_bullet_list_entry = function(key)
     local api = vim.api
-    local file_type = vim.bo.filetype
-    if file_type ~= 'markdown' then
+    if not M.is_file_type('markdown') then
+        print('exiting, no md')
         return
     end
 
-    local mode = vim.api.nvim_get_mode()["mode"]
-    if mode ~= 'i' then
+    if not M.is_mode('i') then
+        print('existing no insert mode')
         return
     end
 
     local cur_line_num = api.nvim_win_get_cursor(0)[1]
-    local cont_prev_line = api.nvim_buf_get_lines(0, cur_line_num - 2, cur_line_num - 1, false)[1]
-    local cont_cur_line = api.nvim_buf_get_lines(0, cur_line_num -1 , cur_line_num, false)[1]
-
-    print('prev line: ', cont_prev_line, '\ncont_cur_line: ', cont_cur_line)
+    local cont_prev_line, cont_cur_line = M.get_prev_and_cur_line(cur_line_num)
 
     if cur_line_num == 1 then
         return
@@ -67,25 +80,22 @@ M.create_new_bullet_list_entry = function(key)
 
     if string.byte(key) == 13 then
         -- check if previouse line was bullet list line
-        if not is_line_bullet_list(cont_prev_line) then
+        if not M.is_bullet_list(cont_prev_line) then
             print('exiting, no bullet list: ', cont_prev_line)
             return
         end
 
-        print('prev_line', cont_prev_line)
-        local indent = get_indendation_line(cont_prev_line)
-        local indented_line = create_line(indent)
+        local indent = M.get_indendation_line(cont_prev_line)
+        local indented_line = M.create_line(indent)
         local lines = {}
         lines[1] = indented_line
 
-        print(h.dump(lines))
-
---       api.nvim_buf_set_lines(0, cur_line_num, cur_line_num, false, lines)
-        api.nvim_exec([[norm i]]..indented_line, false)
+        print('prev line: ', cont_prev_line, '\ncont_cur_line: ', cont_cur_line, 'indented line: ', indented_line)
+        api.nvim_buf_set_lines(0, cur_line_num+1, cur_line_num+1, false, lines)
     end
 
 end
 
-vim.on_key(create_new_bullet_list_entry)
+vim.on_key(M.create_new_bullet_list_entry)
 
 return M
